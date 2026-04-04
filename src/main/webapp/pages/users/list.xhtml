@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="jakarta.faces.html"
+      xmlns:ui="jakarta.faces.facelets"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="jakarta.faces.core">
+
+<ui:composition template="/WEB-INF/templates/layout.xhtml">
+
+    <ui:define name="pageTitle">Gestion des Utilisateurs</ui:define>
+
+    <ui:define name="content">
+
+        <!-- ── Barre d'actions ── -->
+        <div class="action-bar">
+            <h:form prependId="false">
+                <p:commandButton value="Nouvel utilisateur"
+                                 icon="fa fa-plus"
+                                 action="#{utilisateurBean.nouveau}"
+                                 oncomplete="PF('userDialog').show()"
+                                 update="userForm"
+                                 styleClass="btn-primary"/>
+            </h:form>
+        </div>
+
+        <!-- ── Tableau ── -->
+        <div class="card">
+            <p:dataTable id="usersTable"
+                         value="#{utilisateurBean.utilisateurs}"
+                         var="user"
+                         emptyMessage="Aucun utilisateur trouvé."
+                         styleClass="data-table"
+                         paginator="true"
+                         rows="10"
+                         paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}">
+
+                <p:column headerText="Nom" sortBy="#{user.nom}">
+                    <div style="display:flex;align-items:center;gap:10px">
+                        <div style="width:32px;height:32px;border-radius:50%;background:#dbeafe;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;color:#1d4ed8;flex-shrink:0">
+                            #{user.nom.substring(0,1).toUpperCase()}
+                        </div>
+                        #{user.nom}
+                    </div>
+                </p:column>
+
+                <p:column headerText="Email" sortBy="#{user.email}">
+                    #{user.email}
+                </p:column>
+
+                <p:column headerText="Rôle">
+                    <span class="badge
+                        #{user.role.name() == 'ADMIN'   ? 'badge-danger'  :
+                          user.role.name() == 'MANAGER' ? 'badge-purple'  :
+                                                          'badge-info'}">
+                        #{user.role}
+                    </span>
+                </p:column>
+
+                <p:column headerText="Statut">
+                    <span class="badge #{user.actif ? 'badge-success' : 'badge-secondary'}">
+                        #{user.actif ? 'Actif' : 'Inactif'}
+                    </span>
+                </p:column>
+
+                <p:column headerText="Actions" styleClass="actions-col">
+                    <h:form prependId="false">
+                        <p:commandButton icon="fa fa-edit"
+                                         styleClass="btn-icon btn-edit"
+                                         title="Modifier"
+                                         action="#{utilisateurBean.prepareModifier(user)}"
+                                         oncomplete="PF('userDialog').show()"
+                                         update="userForm"/>
+                        <p:commandButton icon="#{user.actif ? 'fa fa-lock' : 'fa fa-unlock'}"
+                                         styleClass="btn-icon"
+                                         title="#{user.actif ? 'Désactiver' : 'Activer'}"
+                                         action="#{utilisateurBean.toggleActif(user.id)}"
+                                         update="usersTable"/>
+                        <p:commandButton icon="fa fa-trash"
+                                         styleClass="btn-icon btn-delete"
+                                         title="Supprimer"
+                                         action="#{utilisateurBean.prepareSupprimer(user.id)}"
+                                         oncomplete="PF('confirmUser').show()"
+                                         update="@none"/>
+                    </h:form>
+                </p:column>
+
+            </p:dataTable>
+        </div>
+
+        <!-- ══ Dialog Formulaire ══ -->
+        <p:dialog header="#{utilisateurBean.utilisateur.id == null ? 'Nouvel utilisateur' : 'Modifier utilisateur'}"
+                  widgetVar="userDialog"
+                  modal="true"
+                  resizable="false"
+                  width="500">
+            <h:form id="userForm" prependId="false">
+                <p:messages showDetail="true" closable="true"/>
+
+                <div class="form-group">
+                    <label>Nom complet *</label>
+                    <p:inputText value="#{utilisateurBean.utilisateur.nom}"
+                                 styleClass="form-control"
+                                 placeholder="Ex: Sara Manager"
+                                 required="true"
+                                 requiredMessage="Le nom est obligatoire."/>
+                </div>
+                <div class="form-group">
+                    <label>Email *</label>
+                    <p:inputText value="#{utilisateurBean.utilisateur.email}"
+                                 styleClass="form-control"
+                                 placeholder="exemple@stock.com"
+                                 required="true"
+                                 requiredMessage="L'email est obligatoire."/>
+                </div>
+                <div class="form-group">
+                    <label>Rôle *</label>
+                    <p:selectOneMenu value="#{utilisateurBean.utilisateur.role}"
+                                     styleClass="form-control"
+                                     required="true"
+                                     requiredMessage="Le rôle est obligatoire.">
+                        <f:selectItem itemLabel="-- Choisir un rôle --"
+                                      itemValue="#{null}"
+                                      noSelectionOption="true"/>
+                        <f:selectItems value="#{utilisateurBean.roles}"
+                                       var="role"
+                                       itemLabel="#{role}"
+                                       itemValue="#{role}"/>
+                    </p:selectOneMenu>
+                </div>
+                <div class="form-group">
+                    <label>#{utilisateurBean.utilisateur.id == null ? 'Mot de passe *' : 'Nouveau mot de passe (vide = inchangé)'}</label>
+                    <p:password value="#{utilisateurBean.nouveauMotDePasse}"
+                                styleClass="form-control"
+                                placeholder="Min. 8 car., 1 maj., 1 chiffre"
+                                feedback="true"
+                                required="#{utilisateurBean.utilisateur.id == null}"
+                                requiredMessage="Le mot de passe est obligatoire."/>
+                </div>
+                <div class="form-group">
+                    <label>Confirmer le mot de passe</label>
+                    <p:password value="#{utilisateurBean.confirmMotDePasse}"
+                                styleClass="form-control"
+                                placeholder="Répétez le mot de passe"
+                                feedback="false"/>
+                </div>
+                <div class="dialog-footer">
+                    <p:commandButton value="Annuler"
+                                     icon="fa fa-times"
+                                     onclick="PF('userDialog').hide()"
+                                     type="button"
+                                     styleClass="btn-outline"/>
+                    <p:commandButton value="Enregistrer"
+                                     icon="fa fa-save"
+                                     action="#{utilisateurBean.sauvegarder}"
+                                     update="usersTable userForm"
+                                     oncomplete="if(!args.validationFailed) PF('userDialog').hide()"
+                                     styleClass="btn-primary"/>
+                </div>
+            </h:form>
+        </p:dialog>
+
+        <!-- ══ Dialog Confirmation ══ -->
+        <p:confirmDialog message="Voulez-vous vraiment supprimer cet utilisateur ?"
+                         header="Confirmer"
+                         severity="warn"
+                         widgetVar="confirmUser">
+            <h:form prependId="false">
+                <p:commandButton value="Oui, supprimer"
+                                 icon="fa fa-trash"
+                                 action="#{utilisateurBean.confirmerSuppression}"
+                                 update="usersTable"
+                                 oncomplete="PF('confirmUser').hide()"
+                                 styleClass="btn-danger"/>
+                <p:commandButton value="Annuler"
+                                 icon="fa fa-times"
+                                 onclick="PF('confirmUser').hide()"
+                                 type="button"
+                                 styleClass="btn-outline"/>
+            </h:form>
+        </p:confirmDialog>
+
+    </ui:define>
+</ui:composition>
+</html>

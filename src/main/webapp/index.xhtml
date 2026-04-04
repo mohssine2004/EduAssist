@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="jakarta.faces.html">
+
+<h:head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>GestionStock — Bienvenue</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com"/>
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&amp;family=DM+Sans:wght@300;400;500&amp;display=swap" rel="stylesheet"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        :root {
+            --dark:   #08101e;
+            --card:   #0d1628;
+            --accent: #3b82f6;
+            --cyan:   #06b6d4;
+            --violet: #a78bfa;
+            --text:   #f1f5f9;
+            --muted:  #94a3b8;
+            --border: rgba(255,255,255,0.06);
+        }
+        html, body { height: 100%; }
+        body { background: var(--dark); color: var(--text); font-family: 'DM Sans', sans-serif; overflow-x: hidden; }
+
+        .bg-grid {
+            position: fixed; inset: 0; z-index: 0; pointer-events: none;
+            background-image: linear-gradient(rgba(59,130,246,0.025) 1px, transparent 1px), linear-gradient(90deg, rgba(59,130,246,0.025) 1px, transparent 1px);
+            background-size: 56px 56px;
+        }
+        .bg-glow { position: fixed; width: 500px; height: 500px; border-radius: 50%; filter: blur(130px); opacity: 0.1; z-index: 0; pointer-events: none; animation: drift 14s ease-in-out infinite alternate; }
+        .bg-glow-1 { background: #3b82f6; top: -150px; left: -80px; }
+        .bg-glow-2 { background: #a78bfa; bottom: -150px; right: -80px; animation-delay: -7s; }
+        @keyframes drift { from { transform: translate(0,0) scale(1); } to { transform: translate(30px,20px) scale(1.08); } }
+
+        nav {
+            position: relative; z-index: 10;
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 14px 48px; border-bottom: 1px solid var(--border);
+        }
+        .nav-logo { display: flex; align-items: center; gap: 9px; font-family: 'Syne', sans-serif; font-weight: 800; font-size: 16px; color: var(--text); text-decoration: none; }
+        .logo-box { width: 30px; height: 30px; background: linear-gradient(135deg, var(--accent), var(--cyan)); border-radius: 7px; display: flex; align-items: center; justify-content: center; font-size: 13px; color: #fff; }
+        .nav-btn { display: inline-flex; align-items: center; gap: 7px; padding: 8px 18px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.12); background: rgba(255,255,255,0.05); color: #cbd5e1; font-size: 13px; font-family: 'DM Sans', sans-serif; font-weight: 500; cursor: pointer; text-decoration: none; transition: all 0.2s; }
+        .nav-btn:hover { background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.2); color: #fff; }
+
+        .hero { position: relative; z-index: 1; display: flex; flex-direction: column; align-items: center; text-align: center; padding: 60px 24px 40px; }
+
+        .hero-badge { display: inline-flex; align-items: center; gap: 7px; background: rgba(59,130,246,0.08); border: 1px solid rgba(59,130,246,0.18); color: #93c5fd; padding: 5px 14px; border-radius: 100px; font-size: 12px; font-weight: 500; margin-bottom: 24px; animation: fadeUp 0.5s ease both; }
+        .badge-dot { width: 5px; height: 5px; background: var(--cyan); border-radius: 50%; animation: blink 2s ease-in-out infinite; }
+        @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.4} }
+
+        .hero-title { font-family: 'Syne', sans-serif; font-size: clamp(38px, 6vw, 72px); font-weight: 800; line-height: 1.05; letter-spacing: -2px; margin-bottom: 18px; animation: fadeUp 0.5s 0.1s ease both; }
+        .title-plain { color: var(--text); display: block; }
+        .title-grad { display: block; background: linear-gradient(90deg, var(--accent), var(--cyan), var(--violet)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+
+        .hero-sub { font-size: 16px; color: var(--muted); max-width: 460px; line-height: 1.75; font-weight: 300; margin-bottom: 36px; animation: fadeUp 0.5s 0.2s ease both; }
+
+        .hero-cta { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; margin-bottom: 64px; animation: fadeUp 0.5s 0.3s ease both; }
+
+        .btn-primary { display: inline-flex; align-items: center; gap: 8px; padding: 13px 26px; border-radius: 10px; background: linear-gradient(135deg, var(--accent), var(--cyan)); color: #fff; font-size: 14px; font-weight: 500; font-family: 'DM Sans', sans-serif; text-decoration: none; border: none; cursor: pointer; box-shadow: 0 6px 20px rgba(59,130,246,0.25); transition: all 0.25s; }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 10px 28px rgba(59,130,246,0.4); }
+        .btn-ghost { display: inline-flex; align-items: center; gap: 8px; padding: 13px 26px; border-radius: 10px; background: rgba(255,255,255,0.04); color: #cbd5e1; font-size: 14px; font-weight: 500; font-family: 'DM Sans', sans-serif; text-decoration: none; border: 1px solid var(--border); cursor: pointer; transition: all 0.25s; }
+        .btn-ghost:hover { background: rgba(255,255,255,0.08); color: #fff; transform: translateY(-2px); }
+
+        .stats-grid { position: relative; z-index: 1; display: grid; grid-template-columns: repeat(4,1fr); gap: 1px; background: var(--border); border: 1px solid var(--border); border-radius: 16px; overflow: hidden; max-width: 900px; margin: 0 auto 80px; width: calc(100% - 64px); animation: fadeUp 0.5s 0.4s ease both; }
+
+        .stat-card { background: var(--card); padding: 22px 18px; text-align: center; position: relative; transition: background 0.2s; }
+        .stat-card:hover { background: #111e35; }
+        .stat-tag { position: absolute; top: 10px; right: 10px; font-size: 9px; font-weight: 600; padding: 2px 7px; border-radius: 4px; letter-spacing: 0.4px; text-transform: uppercase; }
+        .stat-icon-wrap { width: 36px; height: 36px; border-radius: 9px; display: flex; align-items: center; justify-content: center; font-size: 15px; margin: 0 auto 10px; }
+        .stat-num { font-family: 'Syne', sans-serif; font-size: 30px; font-weight: 800; line-height: 1; margin-bottom: 5px; }
+        .stat-lbl { font-size: 11px; color: #64748b; letter-spacing: 0.3px; }
+
+        .s-blue  .stat-icon-wrap { background: rgba(59,130,246,0.12); color: #60a5fa; }
+        .s-blue  .stat-num       { color: #60a5fa; }
+        .s-blue  .stat-tag       { background: rgba(59,130,246,0.12); color: #93c5fd; }
+        .s-green .stat-icon-wrap { background: rgba(16,185,129,0.12); color: #34d399; }
+        .s-green .stat-num       { color: #34d399; }
+        .s-green .stat-tag       { background: rgba(16,185,129,0.12); color: #6ee7b7; }
+        .s-violet .stat-icon-wrap{ background: rgba(167,139,250,0.12); color: #c4b5fd; }
+        .s-violet .stat-num      { color: #c4b5fd; }
+        .s-violet .stat-tag      { background: rgba(167,139,250,0.12); color: #ddd6fe; }
+        .s-amber .stat-icon-wrap { background: rgba(245,158,11,0.12); color: #fbbf24; }
+        .s-amber .stat-num       { color: #fbbf24; }
+        .s-amber .stat-tag       { background: rgba(245,158,11,0.12); color: #fde68a; }
+
+        .features { position: relative; z-index: 1; display: grid; grid-template-columns: repeat(3,1fr); gap: 16px; max-width: 900px; margin: 0 auto 80px; width: calc(100% - 64px); }
+        .feat-card { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 24px; transition: all 0.25s; animation: fadeUp 0.5s ease both; }
+        .feat-card:nth-child(1){animation-delay:0.5s} .feat-card:nth-child(2){animation-delay:0.6s} .feat-card:nth-child(3){animation-delay:0.7s}
+        .feat-card:hover { border-color: rgba(59,130,246,0.25); transform: translateY(-3px); }
+        .feat-icon { width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 16px; margin-bottom: 14px; }
+        .fi-blue  { background: rgba(59,130,246,0.12); color: #60a5fa; }
+        .fi-cyan  { background: rgba(6,182,212,0.12);  color: #22d3ee; }
+        .fi-amber { background: rgba(245,158,11,0.12); color: #fbbf24; }
+        .feat-title { font-family: 'Syne', sans-serif; font-size: 15px; font-weight: 700; margin-bottom: 7px; color: var(--text); }
+        .feat-desc { font-size: 13px; color: var(--muted); line-height: 1.65; }
+
+        footer { position: relative; z-index: 1; text-align: center; padding: 20px; border-top: 1px solid var(--border); color: #475569; font-size: 12px; }
+
+        @keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+        @media (max-width: 768px) {
+            nav { padding: 14px 20px; }
+            .stats-grid { grid-template-columns: repeat(2,1fr); width: calc(100% - 32px); }
+            .features { grid-template-columns: 1fr; width: calc(100% - 32px); }
+            .hero-title { font-size: 38px; letter-spacing: -1px; }
+        }
+    </style>
+</h:head>
+
+<h:body>
+    <div class="bg-grid"/>
+    <div class="bg-glow bg-glow-1"/>
+    <div class="bg-glow bg-glow-2"/>
+
+    <nav>
+        <a class="nav-logo" href="#">
+            <div class="logo-box"><i class="fa fa-boxes-stacked"/></div>
+            GestionStock
+        </a>
+        <a href="pages/login.xhtml" class="nav-btn">
+            Se connecter <i class="fa fa-arrow-right"/>
+        </a>
+    </nav>
+
+    <section class="hero">
+        <div class="hero-badge">
+            <div class="badge-dot"/>
+            Système de gestion professionnel
+        </div>
+        <h1 class="hero-title">
+            <span class="title-plain">Gérez votre stock</span>
+            <span class="title-grad">sans effort.</span>
+        </h1>
+        <p class="hero-sub">
+            Une plateforme complète pour suivre vos produits,
+            catégories et niveaux de stock en temps réel.
+        </p>
+        <div class="hero-cta">
+            <a href="pages/login.xhtml" class="btn-primary">
+                <i class="fa fa-sign-in-alt"/> Se connecter
+            </a>
+            <a href="#features" class="btn-ghost">
+                <i class="fa fa-circle-info"/> En savoir plus
+            </a>
+        </div>
+    </section>
+
+    <div class="stats-grid">
+        <div class="stat-card s-blue">
+            <span class="stat-tag">Sécurité</span>
+            <div class="stat-icon-wrap"><i class="fa fa-shield-halved"/></div>
+            <div class="stat-num">3</div>
+            <div class="stat-lbl">Rôles utilisateurs</div>
+        </div>
+        <div class="stat-card s-green">
+            <span class="stat-tag">Hashage</span>
+            <div class="stat-icon-wrap"><i class="fa fa-lock"/></div>
+            <div class="stat-num">100%</div>
+            <div class="stat-lbl">Sécurisé BCrypt</div>
+        </div>
+        <div class="stat-card s-violet">
+            <span class="stat-tag">Stack</span>
+            <div class="stat-icon-wrap"><i class="fa fa-layer-group"/></div>
+            <div class="stat-num">JSF</div>
+            <div class="stat-lbl">+ Hibernate MVC</div>
+        </div>
+        <div class="stat-card s-amber">
+            <span class="stat-tag">Capacité</span>
+            <div class="stat-icon-wrap"><i class="fa fa-infinity"/></div>
+            <div class="stat-num">∞</div>
+            <div class="stat-lbl">Produits gérables</div>
+        </div>
+    </div>
+
+    <div id="features" class="features">
+        <div class="feat-card">
+            <div class="feat-icon fi-blue"><i class="fa fa-warehouse"/></div>
+            <div class="feat-title">Gestion du stock</div>
+            <div class="feat-desc">Suivez vos niveaux en temps réel avec alertes automatiques pour les stocks faibles et ruptures.</div>
+        </div>
+        <div class="feat-card">
+            <div class="feat-icon fi-cyan"><i class="fa fa-users-gear"/></div>
+            <div class="feat-title">Gestion des rôles</div>
+            <div class="feat-desc">Admin, Manager et Employé — chaque utilisateur accède uniquement à ce dont il a besoin.</div>
+        </div>
+        <div class="feat-card">
+            <div class="feat-icon fi-amber"><i class="fa fa-chart-pie"/></div>
+            <div class="feat-title">Tableau de bord</div>
+            <div class="feat-desc">Vue synthétique avec statistiques globales, alertes et indicateurs clés en un coup d'œil.</div>
+        </div>
+    </div>
+
+    <!-- Comptes de test -->
+    <section style="position: relative; z-index: 1; max-width: 900px; margin: 0 auto 80px; width: calc(100% - 64px);">
+        <h2 style="font-family: 'Syne', sans-serif; font-size: 24px; font-weight: 700; margin-bottom: 20px; text-align: center; color: var(--text);">📋 Comptes de test disponibles</h2>
+        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px;">
+            <!-- Admin -->
+            <div style="background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 18px; text-align: center;">
+                <div style="font-size: 24px; margin-bottom: 8px;"><i class="fa fa-crown" style="color: #fbbf24;"/></div>
+                <div style="font-weight: 600; font-size: 13px; margin-bottom: 8px; color: #fbbf24;">ADMINISTRATEUR</div>
+                <div style="background: rgba(59,130,246,0.1); padding: 8px; border-radius: 6px; margin-bottom: 6px;">
+                    <div style="font-size: 12px; color: #64748b;">Email</div>
+                    <div style="font-family: monospace; font-size: 13px; color: #93c5fd;">admin@test.com</div>
+                </div>
+                <div style="background: rgba(59,130,246,0.1); padding: 8px; border-radius: 6px;">
+                    <div style="font-size: 12px; color: #64748b;">Mot de passe</div>
+                    <div style="font-family: monospace; font-size: 13px; color: #93c5fd;">Admin@12345</div>
+                </div>
+            </div>
+            <!-- Manager -->
+            <div style="background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 18px; text-align: center;">
+                <div style="font-size: 24px; margin-bottom: 8px;"><i class="fa fa-briefcase" style="color: #a78bfa;"/></div>
+                <div style="font-weight: 600; font-size: 13px; margin-bottom: 8px; color: #c4b5fd;">MANAGER</div>
+                <div style="background: rgba(167,139,250,0.1); padding: 8px; border-radius: 6px; margin-bottom: 6px;">
+                    <div style="font-size: 12px; color: #64748b;">Email</div>
+                    <div style="font-family: monospace; font-size: 13px; color: #d8b4fe;">manager@test.com</div>
+                </div>
+                <div style="background: rgba(167,139,250,0.1); padding: 8px; border-radius: 6px;">
+                    <div style="font-size: 12px; color: #64748b;">Mot de passe</div>
+                    <div style="font-family: monospace; font-size: 13px; color: #d8b4fe;">Manager@1234</div>
+                </div>
+            </div>
+            <!-- Employé -->
+            <div style="background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 18px; text-align: center;">
+                <div style="font-size: 24px; margin-bottom: 8px;"><i class="fa fa-user" style="color: #60a5fa;"/></div>
+                <div style="font-weight: 600; font-size: 13px; margin-bottom: 8px; color: #93c5fd;">EMPLOYÉ</div>
+                <div style="background: rgba(59,130,246,0.1); padding: 8px; border-radius: 6px; margin-bottom: 6px;">
+                    <div style="font-size: 12px; color: #64748b;">Email</div>
+                    <div style="font-family: monospace; font-size: 13px; color: #93c5fd;">employe@test.com</div>
+                </div>
+                <div style="background: rgba(59,130,246,0.1); padding: 8px; border-radius: 6px;">
+                    <div style="font-size: 12px; color: #64748b;">Mot de passe</div>
+                    <div style="font-family: monospace; font-size: 13px; color: #93c5fd;">Employe@1234</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        © 2025 GestionStock — ELADDAOUI · MOHSSINE · JADID6HARON
+    </footer>
+
+</h:body>
+</html>

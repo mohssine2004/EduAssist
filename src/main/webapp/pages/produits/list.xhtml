@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="jakarta.faces.html"
+      xmlns:ui="jakarta.faces.facelets"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="jakarta.faces.core">
+
+<ui:composition template="/WEB-INF/templates/layout.xhtml">
+
+    <ui:define name="pageTitle">Gestion des Produits</ui:define>
+
+    <ui:define name="content">
+
+        <!-- ── Barre d'actions ── -->
+        <div class="action-bar">
+            <h:form id="searchForm" prependId="false">
+                <p:inputText value="#{produitBean.recherche}"
+                             placeholder="Rechercher un produit..."
+                             styleClass="search-input"/>
+                <p:commandButton value="Rechercher"
+                                 icon="fa fa-search"
+                                 action="#{produitBean.rechercher}"
+                                 update="produitsTable"
+                                 styleClass="btn-secondary"/>
+                <p:commandButton value="Réinitialiser"
+                                 icon="fa fa-times"
+                                 action="#{produitBean.reinitialiserRecherche}"
+                                 update="produitsTable searchForm"
+                                 styleClass="btn-outline"/>
+            </h:form>
+
+            <ui:fragment rendered="#{loginBean.isAdminOrManager()}">
+                <h:form prependId="false">
+                    <p:commandButton value="Nouveau produit"
+                                     icon="fa fa-plus"
+                                     action="#{produitBean.nouveau}"
+                                     oncomplete="PF('produitDialog').show()"
+                                     update="produitForm"
+                                     styleClass="btn-primary"/>
+                </h:form>
+            </ui:fragment>
+        </div>
+
+        <!-- ── Tableau des produits ── -->
+        <div class="card">
+            <p:dataTable id="produitsTable"
+                         value="#{produitBean.produits}"
+                         var="produit"
+                         emptyMessage="Aucun produit trouvé."
+                         styleClass="data-table"
+                         paginator="true"
+                         rows="10"
+                         paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}">
+
+                <p:column headerText="Référence" sortBy="#{produit.reference}">
+                    <span class="badge badge-info">#{produit.reference}</span>
+                </p:column>
+
+                <p:column headerText="Nom" sortBy="#{produit.nom}">
+                    #{produit.nom}
+                </p:column>
+
+                <p:column headerText="Catégorie">
+                    <span class="badge badge-purple">#{produit.categorie.nom}</span>
+                </p:column>
+
+                <p:column headerText="Prix">
+                    #{produit.prixFormate}
+                </p:column>
+
+                <p:column headerText="Stock">
+                    #{produit.stock != null ? produit.stock.quantite : 0}
+                </p:column>
+
+                <p:column headerText="État">
+                    <span class="badge
+                        #{produit.stock == null ? 'badge-secondary' :
+                          produit.stock.etatStock == 'OK'     ? 'badge-success' :
+                          produit.stock.etatStock == 'FAIBLE' ? 'badge-warning' :
+                                                                 'badge-danger'}">
+                        #{produit.stock != null ? produit.stock.etatStock : 'N/A'}
+                    </span>
+                </p:column>
+
+                <ui:fragment rendered="#{loginBean.isAdminOrManager()}">
+                    <p:column headerText="Actions" styleClass="actions-col">
+                        <h:form prependId="false">
+                            <p:commandButton icon="fa fa-edit"
+                                             styleClass="btn-icon btn-edit"
+                                             title="Modifier"
+                                             action="#{produitBean.prepareModifier(produit)}"
+                                             oncomplete="PF('produitDialog').show()"
+                                             update="produitForm"/>
+                            <ui:fragment rendered="#{loginBean.isAdmin()}">
+                                <p:commandButton icon="fa fa-trash"
+                                                 styleClass="btn-icon btn-delete"
+                                                 title="Supprimer"
+                                                 action="#{produitBean.prepareSupprimer(produit.id)}"
+                                                 oncomplete="PF('confirmProduit').show()"
+                                                 update="@none"/>
+                            </ui:fragment>
+                        </h:form>
+                    </p:column>
+                </ui:fragment>
+
+            </p:dataTable>
+        </div>
+
+        <!-- ══ Dialog Formulaire Produit ══ -->
+        <p:dialog header="#{produitBean.produit.id == null ? 'Nouveau produit' : 'Modifier produit'}"
+                  widgetVar="produitDialog"
+                  modal="true"
+                  resizable="false"
+                  width="540">
+
+            <h:form id="produitForm" prependId="false">
+                <p:messages showDetail="true" closable="true"/>
+
+                <div class="form-group">
+                    <label>Nom *</label>
+                    <p:inputText value="#{produitBean.produit.nom}"
+                                 styleClass="form-control"
+                                 placeholder="Nom du produit"
+                                 required="true"
+                                 requiredMessage="Le nom est obligatoire."/>
+                </div>
+
+                <div class="form-group">
+                    <label>Référence *</label>
+                    <p:inputText value="#{produitBean.produit.reference}"
+                                 styleClass="form-control"
+                                 placeholder="Ex: INFO-001"
+                                 required="true"
+                                 requiredMessage="La référence est obligatoire."/>
+                </div>
+
+                <div class="form-group">
+                    <label>Prix unitaire (MAD) *</label>
+                    <p:inputNumber value="#{produitBean.produit.prixUnitaire}"
+                                   styleClass="form-control"
+                                   minValue="0"
+                                   required="true"
+                                   requiredMessage="Le prix est obligatoire."/>
+                </div>
+
+                <!-- ── Catégorie — bind sur categorieId (Long) ── -->
+                <div class="form-group">
+                    <label>Catégorie *</label>
+                    <p:selectOneMenu value="#{produitBean.categorieId}"
+                                     styleClass="form-control"
+                                     required="true"
+                                     requiredMessage="La catégorie est obligatoire.">
+                        <f:selectItem itemLabel="-- Choisir une catégorie --"
+                                      itemValue="#{null}"
+                                      noSelectionOption="true"/>
+                        <f:selectItems value="#{produitBean.categories}"
+                                       var="cat"
+                                       itemLabel="#{cat.nom}"
+                                       itemValue="#{cat.id}"/>
+                    </p:selectOneMenu>
+                </div>
+
+                <!-- Quantité + seuil — création seulement -->
+                <ui:fragment rendered="#{produitBean.produit.id == null}">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Quantité initiale</label>
+                            <p:inputNumber value="#{produitBean.quantiteInitiale}"
+                                           styleClass="form-control"
+                                           minValue="0"/>
+                        </div>
+                        <div class="form-group">
+                            <label>Seuil minimum</label>
+                            <p:inputNumber value="#{produitBean.seuilMinimum}"
+                                           styleClass="form-control"
+                                           minValue="0"/>
+                        </div>
+                    </div>
+                </ui:fragment>
+
+                <div class="dialog-footer">
+                    <p:commandButton value="Annuler"
+                                     icon="fa fa-times"
+                                     onclick="PF('produitDialog').hide()"
+                                     type="button"
+                                     styleClass="btn-outline"/>
+                    <p:commandButton value="Enregistrer"
+                                     icon="fa fa-save"
+                                     action="#{produitBean.sauvegarder}"
+                                     update="produitsTable produitForm"
+                                     oncomplete="if(!args.validationFailed) PF('produitDialog').hide()"
+                                     styleClass="btn-primary"/>
+                </div>
+            </h:form>
+        </p:dialog>
+
+        <!-- ══ Dialog Confirmation suppression ══ -->
+        <p:confirmDialog message="Voulez-vous vraiment supprimer ce produit ?"
+                         header="Confirmer la suppression"
+                         severity="warn"
+                         widgetVar="confirmProduit">
+            <h:form prependId="false">
+                <p:commandButton value="Oui, supprimer"
+                                 icon="fa fa-trash"
+                                 action="#{produitBean.confirmerSuppression}"
+                                 update="produitsTable"
+                                 oncomplete="PF('confirmProduit').hide()"
+                                 styleClass="btn-danger"/>
+                <p:commandButton value="Annuler"
+                                 icon="fa fa-times"
+                                 onclick="PF('confirmProduit').hide()"
+                                 type="button"
+                                 styleClass="btn-outline"/>
+            </h:form>
+        </p:confirmDialog>
+
+    </ui:define>
+</ui:composition>
+</html>

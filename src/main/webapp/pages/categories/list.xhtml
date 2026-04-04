@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="jakarta.faces.html"
+      xmlns:ui="jakarta.faces.facelets"
+      xmlns:p="http://primefaces.org/ui">
+
+<ui:composition template="/WEB-INF/templates/layout.xhtml">
+
+    <ui:define name="pageTitle">Gestion des Catégories</ui:define>
+
+    <ui:define name="content">
+
+        <!-- ── Bouton nouveau ── -->
+        <div class="action-bar">
+            <p:commandButton value="Nouvelle catégorie"
+                             icon="fa fa-plus"
+                             oncomplete="PF('catDialog').show()"
+                             styleClass="btn-primary"
+                             action="#{categorieBean.nouveau}"
+                             update="catForm"/>
+        </div>
+
+        <!-- ── Tableau ── -->
+        <div class="card">
+            <p:dataTable id="categoriesTable"
+                         value="#{categorieBean.categories}"
+                         var="cat"
+                         emptyMessage="Aucune catégorie trouvée."
+                         styleClass="data-table"
+                         paginator="true"
+                         rows="10"
+                         paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}">
+
+                <p:column headerText="Nom" sortBy="#{cat.nom}">
+                    <span class="badge badge-purple">#{cat.nom}</span>
+                </p:column>
+
+                <p:column headerText="Description">
+                    #{cat.description}
+                </p:column>
+
+                <p:column headerText="Nb Produits">
+                    <span class="badge badge-info">#{cat.nbProduits}</span>
+                </p:column>
+
+                <p:column headerText="Actions" styleClass="actions-col">
+                    <p:commandButton icon="fa fa-edit"
+                                     styleClass="btn-icon btn-edit"
+                                     title="Modifier"
+                                     action="#{categorieBean.prepareModifier(cat)}"
+                                     oncomplete="PF('catDialog').show()"
+                                     update="catForm"/>
+
+                    <ui:fragment rendered="#{loginBean.isAdmin()}">
+                        <p:commandButton icon="fa fa-trash"
+                                         styleClass="btn-icon btn-delete"
+                                         title="Supprimer"
+                                         action="#{categorieBean.prepareSupprimer(cat.id)}"
+                                         oncomplete="PF('confirmCatDialog').show()"
+                                         update="@none"/>
+                    </ui:fragment>
+                </p:column>
+
+            </p:dataTable>
+        </div>
+
+        <!-- ── Dialog Formulaire ── -->
+        <p:dialog header="#{categorieBean.categorie.id == null ? 'Nouvelle catégorie' : 'Modifier'}"
+                  widgetVar="catDialog"
+                  modal="true"
+                  resizable="false"
+                  width="480">
+            <h:form id="catForm">
+                <div class="form-group">
+                    <label>Nom *</label>
+                    <p:inputText value="#{categorieBean.categorie.nom}"
+                                 styleClass="form-control"
+                                 required="true"
+                                 requiredMessage="Le nom est obligatoire."/>
+                </div>
+                <div class="form-group">
+                    <label>Description</label>
+                    <p:inputTextarea value="#{categorieBean.categorie.description}"
+                                     styleClass="form-control"
+                                     rows="3"/>
+                </div>
+                <div class="dialog-footer">
+                    <p:commandButton value="Annuler"
+                                     onclick="PF('catDialog').hide()"
+                                     type="button"
+                                     styleClass="btn-outline"/>
+                    <p:commandButton value="Enregistrer"
+                                     icon="fa fa-save"
+                                     action="#{categorieBean.sauvegarder}"
+                                     update="categoriesTable catForm"
+                                     oncomplete="if(!args.validationFailed) PF('catDialog').hide()"
+                                     styleClass="btn-primary"/>
+                </div>
+            </h:form>
+        </p:dialog>
+
+        <!-- ── Dialog Confirmation ── -->
+        <p:confirmDialog message="Voulez-vous supprimer cette catégorie ?"
+                         header="Confirmer"
+                         severity="warn"
+                         widgetVar="confirmCatDialog">
+            <h:form>
+                <p:commandButton value="Oui, supprimer"
+                                 icon="fa fa-trash"
+                                 action="#{categorieBean.confirmerSuppression}"
+                                 update="categoriesTable"
+                                 oncomplete="PF('confirmCatDialog').hide()"
+                                 styleClass="btn-danger"/>
+                <p:commandButton value="Annuler"
+                                 onclick="PF('confirmCatDialog').hide()"
+                                 type="button"
+                                 styleClass="btn-outline"/>
+            </h:form>
+        </p:confirmDialog>
+
+    </ui:define>
+</ui:composition>
+</html>
+

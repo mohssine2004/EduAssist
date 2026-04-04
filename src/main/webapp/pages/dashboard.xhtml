@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="jakarta.faces.html"
+      xmlns:ui="jakarta.faces.facelets"
+      xmlns:p="http://primefaces.org/ui">
+
+<ui:composition template="/WEB-INF/templates/layout.xhtml">
+
+    <ui:define name="pageTitle">Tableau de bord</ui:define>
+
+    <ui:define name="content">
+
+        <!-- ── Cartes statistiques ── -->
+        <div class="stats-grid">
+
+            <div class="stat-card stat-blue">
+                <div class="stat-icon"><i class="fa fa-box"></i></div>
+                <div class="stat-info">
+                    <span class="stat-value">#{dashboardBean.resume['nbProduits']}</span>
+                    <span class="stat-label">Produits</span>
+                </div>
+            </div>
+
+            <div class="stat-card stat-green">
+                <div class="stat-icon"><i class="fa fa-tags"></i></div>
+                <div class="stat-info">
+                    <span class="stat-value">#{dashboardBean.resume['nbCategories']}</span>
+                    <span class="stat-label">Catégories</span>
+                </div>
+            </div>
+
+            <div class="stat-card stat-orange">
+                <div class="stat-icon"><i class="fa fa-triangle-exclamation"></i></div>
+                <div class="stat-info">
+                    <span class="stat-value">#{dashboardBean.resume['nbStocksFaibles']}</span>
+                    <span class="stat-label">Stocks faibles</span>
+                </div>
+            </div>
+
+            <div class="stat-card stat-red">
+                <div class="stat-icon"><i class="fa fa-circle-xmark"></i></div>
+                <div class="stat-info">
+                    <span class="stat-value">#{dashboardBean.resume['nbRuptures']}</span>
+                    <span class="stat-label">Ruptures</span>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- ── Tableaux d'alertes ── -->
+        <div class="dashboard-tables">
+
+            <!-- Stocks faibles -->
+            <div class="card">
+                <div class="card-header">
+                    <i class="fa fa-triangle-exclamation text-orange"></i>
+                    Stocks faibles
+                </div>
+                <p:dataTable value="#{dashboardBean.stocksFaibles}"
+                             var="stock"
+                             emptyMessage="Aucun stock faible."
+                             styleClass="data-table">
+                    <p:column headerText="Produit">
+                        #{stock.produit.nom}
+                    </p:column>
+                    <p:column headerText="Quantité">
+                        <span class="badge badge-warning">#{stock.quantite}</span>
+                    </p:column>
+                    <p:column headerText="Seuil min.">
+                        #{stock.seuilMinimum}
+                    </p:column>
+                </p:dataTable>
+            </div>
+
+            <!-- Ruptures -->
+            <div class="card">
+                <div class="card-header">
+                    <i class="fa fa-circle-xmark text-red"></i>
+                    Produits en rupture
+                </div>
+                <p:dataTable value="#{dashboardBean.produitsEnRupture}"
+                             var="stock"
+                             emptyMessage="Aucune rupture de stock."
+                             styleClass="data-table">
+                    <p:column headerText="Produit">
+                        #{stock.produit.nom}
+                    </p:column>
+                    <p:column headerText="Référence">
+                        #{stock.produit.reference}
+                    </p:column>
+                    <p:column headerText="État">
+                        <span class="badge badge-danger">RUPTURE</span>
+                    </p:column>
+                </p:dataTable>
+            </div>
+
+        </div>
+
+    </ui:define>
+</ui:composition>
+</html>
+

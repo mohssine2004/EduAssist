@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<persistence xmlns="https://jakarta.ee/xml/ns/persistence"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xsi:schemaLocation="https://jakarta.ee/xml/ns/persistence
+             https://jakarta.ee/xml/ns/persistence/persistence_3_0.xsd"
+             version="3.0">
+
+    <persistence-unit name="gestionStockPU" transaction-type="RESOURCE_LOCAL">
+
+        <!-- Provider Hibernate -->
+        <provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
+
+        <!-- ── Entités JPA ── -->
+        <class>org.example.gestionstock.model.Utilisateur</class>
+        <class>org.example.gestionstock.model.Categorie</class>
+        <class>org.example.gestionstock.model.Produit</class>
+        <class>org.example.gestionstock.model.Stock</class>
+
+        <exclude-unlisted-classes>false</exclude-unlisted-classes>
+
+        <properties>
+            <!-- ── Connexion MySQL ── -->
+            <property name="jakarta.persistence.jdbc.driver"
+                      value="com.mysql.cj.jdbc.Driver"/>
+            <property name="jakarta.persistence.jdbc.url"
+                      value="jdbc:mysql://localhost:3300/gestion_stock?useSSL=false&amp;serverTimezone=UTC&amp;allowPublicKeyRetrieval=true&amp;characterEncoding=UTF-8&amp;useUnicode=true"/>
+            <property name="jakarta.persistence.jdbc.user"
+                      value="root"/>
+            <property name="jakarta.persistence.jdbc.password"
+                      value="MOHSSINE2004"/>
+
+            <!-- ── Hibernate settings ── -->
+            <!-- Dialecte MySQL 8 -->
+            <property name="hibernate.dialect"
+                      value="org.hibernate.dialect.MySQLDialect"/>
+
+            <!-- Affiche les requêtes SQL dans la console (désactiver en prod) -->
+            <property name="hibernate.show_sql"        value="true"/>
+            <property name="hibernate.format_sql"      value="true"/>
+
+            <!-- validate  → vérifie le schéma sans modifier
+                 update    → met à jour le schéma automatiquement
+                 create    → recrée les tables à chaque démarrage
+                 create-drop→ crée puis supprime à la fermeture       -->
+            <!-- Désactive la génération automatique de DDL ici (évite les erreurs si le datasource n'est pas MySQL) -->
+            <property name="hibernate.hbm2ddl.auto"   value="none"/>
+
+            <!-- Encodage UTF-8 (utiliser UTF-8 pour Java, pas utf8mb4) -->
+            <property name="hibernate.connection.CharSet"           value="UTF-8"/>
+            <property name="hibernate.connection.characterEncoding" value="UTF-8"/>
+            <property name="hibernate.connection.useUnicode"        value="true"/>
+
+            <!-- Pool de connexions (C3P0) -->
+            <property name="hibernate.c3p0.min_size"        value="5"/>
+            <property name="hibernate.c3p0.max_size"        value="20"/>
+            <property name="hibernate.c3p0.timeout"         value="300"/>
+            <property name="hibernate.c3p0.max_statements"  value="50"/>
+        </properties>
+
+    </persistence-unit>
+
+</persistence>

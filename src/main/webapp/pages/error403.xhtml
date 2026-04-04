@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="jakarta.faces.html">
+
+<h:head>
+    <meta charset="UTF-8"/>
+    <title>403 – Interdit</title>
+</h:head>
+
+<h:body>
+    <div style="max-width:800px;margin:40px auto;font-family:Segoe UI,Arial,sans-serif">
+        <h1>403 — Accès interdit</h1>
+        <p>La ressource demandée vous est interdite.</p>
+        <h3>Contexte</h3>
+        <ul>
+            <li>URI demandée : #{facesContext.externalContext.request.requestURI}</li>
+            <li>Méthode : #{facesContext.externalContext.request.method}</li>
+            <li>Contexte de l'application : #{facesContext.externalContext.request.contextPath}</li>
+        </ul>
+        <p>Si vous avez été redirigé par un filtre, vérifiez la session et les rôles.</p>
+        <p><a href="#{facesContext.externalContext.request.contextPath}/pages/login.xhtml">Retour à la page de connexion</a></p>
+    </div>
+</h:body>
+</html>
+

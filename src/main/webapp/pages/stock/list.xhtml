@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="jakarta.faces.html"
+      xmlns:ui="jakarta.faces.facelets"
+      xmlns:p="http://primefaces.org/ui">
+
+<ui:composition template="/WEB-INF/templates/layout.xhtml">
+
+    <ui:define name="pageTitle">Gestion du Stock</ui:define>
+
+    <ui:define name="content">
+
+        <div class="card">
+            <p:dataTable id="stockTable"
+                         value="#{stockBean.stocks}"
+                         var="stock"
+                         emptyMessage="Aucun stock trouvé."
+                         styleClass="data-table"
+                         paginator="true"
+                         rows="10"
+                         paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}">
+
+                <p:column headerText="Référence" sortBy="#{stock.produit.reference}">
+                    <span class="badge badge-info">#{stock.produit.reference}</span>
+                </p:column>
+
+                <p:column headerText="Produit" sortBy="#{stock.produit.nom}">
+                    #{stock.produit.nom}
+                </p:column>
+
+                <p:column headerText="Catégorie">
+                    #{stock.produit.categorie.nom}
+                </p:column>
+
+                <p:column headerText="Quantité" sortBy="#{stock.quantite}">
+                    <strong>#{stock.quantite}</strong>
+                </p:column>
+
+                <p:column headerText="Seuil min.">
+                    #{stock.seuilMinimum}
+                </p:column>
+
+                <p:column headerText="État">
+                    <span class="badge
+                        #{stock.etatStock == 'OK'     ? 'badge-success' :
+                          stock.etatStock == 'FAIBLE' ? 'badge-warning' :
+                                                        'badge-danger'}">
+                        #{stock.etatStock}
+                    </span>
+                </p:column>
+
+                <ui:fragment rendered="#{loginBean.isAdminOrManager()}">
+                    <p:column headerText="Actions" styleClass="actions-col">
+                        <h:form prependId="false">
+                            <p:commandButton icon="fa fa-plus"
+                                             styleClass="btn-icon btn-success"
+                                             title="Approvisionner"
+                                             action="#{stockBean.prepareMiseAJour(stock)}"
+                                             oncomplete="PF('approDialog').show()"
+                                             update="approForm"/>
+                            <p:commandButton icon="fa fa-minus"
+                                             styleClass="btn-icon btn-warning"
+                                             title="Retirer du stock"
+                                             action="#{stockBean.prepareMiseAJour(stock)}"
+                                             oncomplete="PF('retraitDialog').show()"
+                                             update="retraitForm"/>
+                            <p:commandButton icon="fa fa-pen"
+                                             styleClass="btn-icon btn-edit"
+                                             title="Mise à jour directe"
+                                             action="#{stockBean.prepareMiseAJour(stock)}"
+                                             oncomplete="PF('majDialog').show()"
+                                             update="majForm"/>
+                        </h:form>
+                    </p:column>
+                </ui:fragment>
+
+            </p:dataTable>
+        </div>
+
+        <!-- ══ Dialog : Approvisionner ══ -->
+        <p:dialog header="Approvisionner le stock"
+                  widgetVar="approDialog"
+                  modal="true"
+                  resizable="false"
+                  width="400">
+            <h:form id="approForm" prependId="false">
+                <div class="dialog-info">
+                    Produit : <strong>#{stockBean.stockSelectionne != null ? stockBean.stockSelectionne.produit.nom : ''}</strong>
+                </div>
+                <div class="form-group">
+                    <label>Quantité à ajouter *</label>
+                    <p:inputNumber value="#{stockBean.quantiteOperation}"
+                                   styleClass="form-control"
+                                   minValue="1"
+                                   required="true"
+                                   requiredMessage="La quantité est obligatoire."/>
+                </div>
+                <div class="dialog-footer">
+                    <p:commandButton value="Annuler"
+                                     icon="fa fa-times"
+                                     onclick="PF('approDialog').hide()"
+                                     type="button"
+                                     styleClass="btn-outline"/>
+                    <p:commandButton value="Approvisionner"
+                                     icon="fa fa-plus"
+                                     action="#{stockBean.approvisionner(stockBean.stockSelectionne.produit.id)}"
+                                     update="stockTable approForm"
+                                     oncomplete="if(!args.validationFailed) PF('approDialog').hide()"
+                                     styleClass="btn-success"/>
+                </div>
+            </h:form>
+        </p:dialog>
+
+        <!-- ══ Dialog : Retrait ══ -->
+        <p:dialog header="Retirer du stock"
+                  widgetVar="retraitDialog"
+                  modal="true"
+                  resizable="false"
+                  width="400">
+            <h:form id="retraitForm" prependId="false">
+                <div class="dialog-info">
+                    Produit : <strong>#{stockBean.stockSelectionne != null ? stockBean.stockSelectionne.produit.nom : ''}</strong>
+                    — Disponible : <strong>#{stockBean.stockSelectionne != null ? stockBean.stockSelectionne.quantite : 0}</strong>
+                </div>
+                <div class="form-group">
+                    <label>Quantité à retirer *</label>
+                    <p:inputNumber value="#{stockBean.quantiteOperation}"
+                                   styleClass="form-control"
+                                   minValue="1"
+                                   required="true"
+                                   requiredMessage="La quantité est obligatoire."/>
+                </div>
+                <div class="dialog-footer">
+                    <p:commandButton value="Annuler"
+                                     icon="fa fa-times"
+                                     onclick="PF('retraitDialog').hide()"
+                                     type="button"
+                                     styleClass="btn-outline"/>
+                    <p:commandButton value="Retirer"
+                                     icon="fa fa-minus"
+                                     action="#{stockBean.retirerStock(stockBean.stockSelectionne.produit.id)}"
+                                     update="stockTable retraitForm"
+                                     oncomplete="if(!args.validationFailed) PF('retraitDialog').hide()"
+                                     styleClass="btn-warning"/>
+                </div>
+            </h:form>
+        </p:dialog>
+
+        <!-- ══ Dialog : Mise à jour directe ══ -->
+        <p:dialog header="Mise à jour directe"
+                  widgetVar="majDialog"
+                  modal="true"
+                  resizable="false"
+                  width="400">
+            <h:form id="majForm" prependId="false">
+                <div class="dialog-info">
+                    Produit : <strong>#{stockBean.stockSelectionne != null ? stockBean.stockSelectionne.produit.nom : ''}</strong>
+                </div>
+                <div class="form-group">
+                    <label>Nouvelle quantité *</label>
+                    <p:inputNumber value="#{stockBean.nouvelleQuantite}"
+                                   styleClass="form-control"
+                                   minValue="0"
+                                   required="true"
+                                   requiredMessage="La quantité est obligatoire."/>
+                </div>
+                <div class="dialog-footer">
+                    <p:commandButton value="Annuler"
+                                     icon="fa fa-times"
+                                     onclick="PF('majDialog').hide()"
+                                     type="button"
+                                     styleClass="btn-outline"/>
+                    <p:commandButton value="Mettre à jour"
+                                     icon="fa fa-save"
+                                     action="#{stockBean.mettreAJour}"
+                                     update="stockTable majForm"
+                                     oncomplete="if(!args.validationFailed) PF('majDialog').hide()"
+                                     styleClass="btn-primary"/>
+                </div>
+            </h:form>
+        </p:dialog>
+
+    </ui:define>
+</ui:composition>
+</html>

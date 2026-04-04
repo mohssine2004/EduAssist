@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="jakarta.faces.html"
+      xmlns:f="jakarta.faces.core"
+      xmlns:p="http://primefaces.org/ui">
+
+<h:head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Connexion — Gestion de Stock</title>
+    <h:outputStylesheet library="css" name="style.css"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+</h:head>
+
+<h:body styleClass="login-page">
+    <div class="login-container">
+        <div class="login-card">
+
+            <!-- Logo -->
+            <div class="login-header">
+                <i class="fa fa-boxes-stacked login-icon"/>
+                <h1>GestionStock</h1>
+                <p>Connectez-vous à votre espace</p>
+            </div>
+
+            <!-- Formulaire -->
+            <h:form id="loginForm" styleClass="login-form" prependId="false">
+
+                <p:messages id="messages" showDetail="true" closable="true"/>
+
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <p:inputText id="email"
+                                 value="#{loginBean.email}"
+                                 placeholder="votre@email.com"
+                                 styleClass="form-control"
+                                 required="true"
+                                 requiredMessage="L'email est obligatoire."/>
+                    <p:message for="email"/>
+                </div>
+
+                <div class="form-group">
+                    <label for="motDePasse">Mot de passe</label>
+                    <p:password id="motDePasse"
+                                value="#{loginBean.motDePasse}"
+                                placeholder="••••••••"
+                                styleClass="form-control"
+                                feedback="false"
+                                required="true"
+                                requiredMessage="Le mot de passe est obligatoire."/>
+                    <p:message for="motDePasse"/>
+                </div>
+
+                <p:commandButton value="Se connecter"
+                                 icon="fa fa-sign-in-alt"
+                                 action="#{loginBean.login}"
+                                 styleClass="btn-primary btn-full"
+                                 ajax="false"/>
+
+            </h:form>
+
+        </div>
+    </div>
+</h:body>
+</html>

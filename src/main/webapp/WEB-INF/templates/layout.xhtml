@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="jakarta.faces.html"
+      xmlns:f="jakarta.faces.core"
+      xmlns:ui="jakarta.faces.facelets"
+      xmlns:p="http://primefaces.org/ui">
+
+<h:head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>GestionStock</title>
+    <h:outputStylesheet library="css" name="style.css"/>
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+</h:head>
+
+<h:body>
+    <div class="layout-wrapper">
+
+        <!-- ══════════════════════════════════════
+             SIDEBAR
+        ══════════════════════════════════════ -->
+        <div class="sidebar">
+
+            <!-- Logo -->
+            <div class="sidebar-logo">
+                <div class="logo-icon"><i class="fa fa-boxes-stacked"/></div>
+                <span>GestionStock</span>
+            </div>
+
+            <!-- ── Navigation via liens directs (pas besoin de form) ── -->
+            <nav class="sidebar-nav">
+
+                <a href="#{request.contextPath}/pages/dashboard.xhtml" class="nav-item">
+                    <i class="fa fa-chart-pie nav-icon"/>
+                    <span>Dashboard</span>
+                </a>
+
+                <div class="nav-separator">Gestion</div>
+
+                <!-- Produits — Admin + Manager -->
+                <ui:fragment rendered="#{loginBean.isAdminOrManager()}">
+                    <a href="#{request.contextPath}/pages/produits/list.xhtml" class="nav-item">
+                        <i class="fa fa-box nav-icon"/>
+                        <span>Produits</span>
+                    </a>
+                </ui:fragment>
+
+                <!-- Catégories — Admin + Manager -->
+                <ui:fragment rendered="#{loginBean.isAdminOrManager()}">
+                    <a href="#{request.contextPath}/pages/categories/list.xhtml" class="nav-item">
+                        <i class="fa fa-tags nav-icon"/>
+                        <span>Catégories</span>
+                    </a>
+                </ui:fragment>
+
+                <!-- Stock — Tous -->
+                <a href="#{request.contextPath}/pages/stock/list.xhtml" class="nav-item">
+                    <i class="fa fa-warehouse nav-icon"/>
+                    <span>Stock</span>
+                    <ui:fragment rendered="#{stockBean.nbAlertes gt 0}">
+                        <span class="nav-badge">#{stockBean.nbAlertes}</span>
+                    </ui:fragment>
+                </a>
+
+                <!-- Utilisateurs — Admin seulement -->
+                <ui:fragment rendered="#{loginBean.isAdmin()}">
+                    <div class="nav-separator">Administration</div>
+                    <a href="#{request.contextPath}/pages/users/list.xhtml" class="nav-item">
+                        <i class="fa fa-users nav-icon"/>
+                        <span>Utilisateurs</span>
+                    </a>
+                </ui:fragment>
+
+            </nav>
+
+            <!-- Footer sidebar -->
+            <div class="sidebar-footer">
+                <div class="user-card">
+                    <div class="user-avatar">
+                        #{loginBean.utilisateurConnecte.nom.substring(0,1).toUpperCase()}
+                    </div>
+                    <div class="user-details">
+                        <span class="user-name">#{loginBean.utilisateurConnecte.nom}</span>
+                        <span class="user-role role-#{loginBean.utilisateurConnecte.role.name().toLowerCase()}">
+                        #{loginBean.utilisateurConnecte.role}
+                    </span>
+                    </div>
+                </div>
+                <h:form styleClass="logout-form">
+                    <p:commandButton value="Déconnexion"
+                                     icon="fa fa-sign-out-alt"
+                                     action="#{loginBean.logout}"
+                                     ajax="false"
+                                     styleClass="btn-logout"/>
+                </h:form>
+            </div>
+
+        </div>
+
+        <!-- ══════════════════════════════════════
+             MAIN CONTENT
+        ══════════════════════════════════════ -->
+        <div class="main-content">
+
+            <div class="topbar">
+                <h2 class="page-title">
+                    <ui:insert name="pageTitle">Page</ui:insert>
+                </h2>
+                <span class="topbar-user">
+                <i class="fa fa-user-circle"/>
+                #{loginBean.utilisateurConnecte.nom}
+            </span>
+            </div>
+
+            <div class="content-area">
+                <p:messages showDetail="true" closable="true" styleClass="global-messages"/>
+                <ui:insert name="content"/>
+            </div>
+
+        </div>
+
+    </div>
+</h:body>
+</html>
